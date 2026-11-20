@@ -1,0 +1,13 @@
+{
+  "name": "shortsmith-frontend",
+  "private": true,
+  "description": "TypeScript source for the Shortsmith page. The compiled JavaScript is in static/js and is already included, so you only need Node if you want to change the page.",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "check": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,5 @@
+flask
+yt-dlp
+faster-whisper>=1.1
+numpy
+requests

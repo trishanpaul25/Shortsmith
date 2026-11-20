@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Shortsmith: video link to captioned clips</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Shortsmith</a>
+    <nav><a href="#accounts">Accounts</a><a href="#history">Past jobs</a></nav>
+  </header>
+
+  <div id="banner" class="banner" role="alert" hidden></div>
+
+  <main>
+    <section class="hero">
+      <div class="hero-copy">
+        <h1 id="caption-hero" aria-label="Paste a link. Get captioned clips.">
+          <span class="line"><span class="w">Paste</span> <span class="w">a</span> <span class="w">link.</span></span>
+          <span class="line"><span class="w">Get</span> <span class="w">captioned</span> <span class="w">clips.</span></span>
+        </h1>
+        <p class="lead">Shortsmith finds the most exciting moments in a long video or a live stream, cuts them for Reels, Shorts or the feed, and burns in captions that light up word by word. It never downloads the whole video, only a small audio track and the few clips it picks. It runs on your own computer, and posts nothing unless you connect an account and ask it to.</p>
+      </div>
+
+      <form id="job-form" class="panel" autocomplete="off">
+        <div class="seg" role="group" aria-label="Where is the video?">
+          <button type="button" class="on" data-mode="link" aria-pressed="true">Link</button>
+          <button type="button" data-mode="file" aria-pressed="false">Upload a file</button>
+        </div>
+
+        <div id="link-wrap" class="field">
+          <label for="url" class="sr">Video link</label>
+          <input id="url" name="url" type="url" placeholder="A video link, or a live stream that is on right now" required>
+        </div>
+        <div id="file-wrap" class="field" hidden>
+          <label class="drop" for="file">
+            <input id="file" name="file" type="file" accept="video/*,.mkv,.mp4,.mov,.webm">
+            <span id="file-name">Choose a video file from your computer</span>
+          </label>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="clips">How many clips</label>
+            <input id="clips" name="clips" type="number" min="1" max="20" value="5">
+          </div>
+          <div class="field">
+            <label for="length">Clip length: <output id="length-out">30</output> seconds</label>
+            <input id="length" name="length" type="range" min="15" max="90" value="30">
+          </div>
+        </div>
+
+        <fieldset class="choices">
+          <legend>How should it find the best moments?</legend>
+          <label class="opt">
+            <input type="radio" name="picker" value="audio" checked>
+            <span><b>Loudest moments</b><small>Free and fast. Finds the screams, laughs and big reactions.</small></span>
+          </label>
+          <label class="opt">
+            <input type="radio" name="picker" value="gemini">
+            <span><b>Gemini AI + Loudness</b><small>Combines loud excitement peaks with Gemini AI for the best picks, titles & hashtags.</small></span>
+          </label>
+          <label class="opt">
+            <input type="radio" name="picker" value="claude">
+            <span><b>Claude AI + Loudness</b><small>Combines loud excitement peaks with Claude AI for the best picks, titles & hashtags.</small></span>
+          </label>
+        </fieldset>
+
+        <div id="key-wrap" class="field" hidden>
+          <label for="api_key">API key</label>
+          <input id="api_key" name="api_key" type="password" placeholder="Used for this job only and never saved" autocomplete="off">
+          <p class="fine">Uses <code>gemini-3.5-flash-lite</code> (optimized to preserve API quota) with automated model fallback.</p>
+        </div>
+
+        <fieldset class="choices ratios">
+          <legend>Clip format</legend>
+          <label class="opt layout">
+            <input type="radio" name="ratio" value="9:16" checked>
+            <span><i class="shape s916" aria-hidden="true"></i><b>Instagram Reels &amp; YouTube Shorts</b><small>9:16 vertical, 1080×1920</small></span>
+          </label>
+          <label class="opt layout">
+            <input type="radio" name="ratio" value="4:5">
+            <span><i class="shape s45" aria-hidden="true"></i><b>Instagram feed</b><small>4:5 portrait, 1080×1350</small></span>
+          </label>
+          <label class="opt layout">
+            <input type="radio" name="ratio" value="1:1">
+            <span><i class="shape s11" aria-hidden="true"></i><b>Square</b><small>1:1, 1080×1080</small></span>
+          </label>
+          <label class="opt layout">
+            <input type="radio" name="ratio" value="16:9">
+            <span><i class="shape s169" aria-hidden="true"></i><b>Landscape</b><small>16:9, normal YouTube video</small></span>
+          </label>
+        </fieldset>
+
+        <fieldset class="choices two">
+          <legend>How to fit the picture</legend>
+          <label class="opt layout">
+            <input type="radio" name="layout" value="blur" checked>
+            <span><i class="mini blur" aria-hidden="true"></i><b>Full frame</b><small>Whole picture, blurred background</small></span>
+          </label>
+          <label class="opt layout">
+            <input type="radio" name="layout" value="crop">
+            <span><i class="mini crop" aria-hidden="true"></i><b>Zoom in</b><small>Fills the screen, cuts the sides</small></span>
+          </label>
+        </fieldset>
+
+        <details class="more">
+          <summary>More settings</summary>
+          <div class="row2">
+            <div class="field">
+              <label for="model">Caption accuracy</label>
+              <select id="model" name="model">
+                <option value="tiny">Tiny (fastest)</option>
+                <option value="base" selected>Base (balanced)</option>
+                <option value="small">Small (better)</option>
+                <option value="medium">Medium (best, slow)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="lang">Spoken language</label>
+              <input id="lang" name="lang" type="text" maxlength="3" placeholder="Auto. Or en, hi, bn...">
+            </div>
+          </div>
+        </details>
+
+        <fieldset class="choices auto">
+          <legend>After the clips are made</legend>
+          <label class="check off"><input type="checkbox" id="auto-youtube" name="auto_youtube" disabled> <span>Post to YouTube automatically</span></label>
+          <label class="check off"><input type="checkbox" id="auto-instagram" name="auto_instagram" disabled> <span>Post to Instagram as a Reel automatically</span></label>
+          <div id="yt-privacy-wrap" class="field" hidden>
+            <label for="yt_privacy">YouTube privacy</label>
+            <select id="yt_privacy" name="yt_privacy">
+              <option value="private" selected>Private (safest, you publish it later)</option>
+              <option value="unlisted">Unlisted</option>
+              <option value="public">Public</option>
+            </select>
+          </div>
+          <p id="auto-warning" class="fine warn" hidden>Clips are posted without you watching them first. Instagram posts are public. Consider leaving this off and using the Post buttons after you check the clips.</p>
+          <p class="fine">To turn these on, connect an account in <a href="#accounts">Accounts</a>.</p>
+        </fieldset>
+
+        <button id="go" class="go" type="submit">Make clips</button>
+        <p class="fine">Only use videos you own or have permission to clip.</p>
+      </form>
+    </section>
+
+    <section id="job" class="job" hidden aria-live="polite">
+      <h2 id="job-title"></h2>
+      <p id="live-tag" class="live-tag" hidden>Live stream: only the part streamed up to now is used. Run it again later to catch newer moments.</p>
+      <ol class="steps" id="steps">
+        <li data-stage="get"><span id="step-get">Get the audio</span></li>
+        <li data-stage="find">Find the best moments</li>
+        <li data-stage="render">Cut and caption</li>
+      </ol>
+      <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar-fill"></i></div>
+      <p id="step-text" class="step-text"></p>
+      <div class="job-actions">
+        <button id="pause-btn" class="btn ghost" type="button" hidden>Pause</button>
+        <button id="continue-btn" class="btn" type="button" hidden>Continue</button>
+        <button id="retry-btn" class="btn" type="button" hidden>Try again</button>
+        <button id="delete-btn" class="btn ghost danger" type="button" hidden>Delete</button>
+      </div>
+      <div id="error" class="error" hidden></div>
+      <details class="log-wrap" open>
+        <summary>Details</summary>
+        <pre id="log"></pre>
+      </details>
+    </section>
+
+    <section id="results" class="results" hidden>
+      <div class="results-head">
+        <h2>Your clips</h2>
+        <a id="zip" class="btn" href="#">Download all as .zip</a>
+      </div>
+      <div class="timeline">
+        <p id="timeline-label" class="timeline-label">Where the clips come from in the original video</p>
+        <div id="track" class="track"></div>
+        <div class="ticks"><span>0:00</span><span id="tick-end"></span></div>
+      </div>
+      <div id="grid" class="grid"></div>
+    </section>
+
+    <section id="accounts" class="accounts">
+      <h2>Accounts</h2>
+      <p class="muted">Optional. Connect an account so Shortsmith can post clips for you. Logins are saved only on this computer, in <code>data/credentials.json</code>. Steps to get the keys are in the README.</p>
+      <div class="acct-grid">
+        <form id="yt-form" class="panel acct" autocomplete="off">
+          <h3>YouTube <span id="yt-status" class="badge">Not set up</span></h3>
+          <p class="fine">Use a free "Desktop app" OAuth client from Google Cloud. If Google asks for a redirect address, it is <code id="yt-redirect"></code></p>
+          <div class="field"><label for="yt-id">Client ID</label><input id="yt-id" type="text" autocomplete="off"></div>
+          <div class="field"><label for="yt-secret">Client secret</label><input id="yt-secret" type="password" autocomplete="off"></div>
+          <div class="actions">
+            <button type="submit" class="btn small">Save</button>
+            <a id="yt-connect" class="btn small" href="/auth/youtube/start">Connect</a>
+            <button id="yt-disconnect" type="button" class="btn ghost small" hidden>Disconnect</button>
+          </div>
+          <p id="yt-msg" class="fine" role="status"></p>
+        </form>
+        <form id="ig-form" class="panel acct" autocomplete="off">
+          <h3>Instagram <span id="ig-status" class="badge">Not connected</span></h3>
+          <p class="fine">Needs an Instagram Professional (Business or Creator) account and an access token with the content publishing permission.</p>
+          <div class="field"><label for="ig-token">Access token</label><input id="ig-token" type="password" autocomplete="off"></div>
+          <div class="field"><label for="ig-user">Instagram account ID (numbers)</label><input id="ig-user" type="text" inputmode="numeric" autocomplete="off"></div>
+          <div class="field"><label for="ig-host">Token type</label>
+            <select id="ig-host"><option value="facebook">Facebook Login (graph.facebook.com)</option><option value="instagram">Instagram Login (graph.instagram.com)</option></select>
+          </div>
+          <div class="actions">
+            <button type="submit" class="btn small">Save</button>
+            <button id="ig-disconnect" type="button" class="btn ghost small" hidden>Disconnect</button>
+          </div>
+          <p id="ig-msg" class="fine" role="status"></p>
+        </form>
+      </div>
+    </section>
+
+    <section id="history" class="history">
+      <h2>Past jobs</h2>
+      <ul id="history-list" class="history-list"></ul>
+      <p id="history-empty" class="muted">Nothing here yet. Your finished jobs will show up here.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Everything stays in the <code>data</code> folder next to this app. Delete a job here to free its space.</p>
+  </footer>
+
+  <script type="module" src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
